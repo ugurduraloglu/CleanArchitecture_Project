@@ -1,6 +1,7 @@
 ﻿using CleanArchitecture.Domain.Employees;
 using CleanArchitecture_2025.Infrastructure.Context;
 using CleanArchitecture_2025.Infrastructure.Repositories;
+using GenericRepository;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -25,6 +26,8 @@ namespace CleanArchitecture_2025.Infrastructure
 
             //Scrutor kütüphanesi ile dependency ınjection burayı yazmıyoruz =>
             //services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+
+            services.AddScoped<IUnitOfWork>(srv => srv.GetRequiredService<ApplicationDbContext>());
 
             services.Scan(opt => opt
             .FromAssemblies(typeof(InfrastructureRegistrar).Assembly)
