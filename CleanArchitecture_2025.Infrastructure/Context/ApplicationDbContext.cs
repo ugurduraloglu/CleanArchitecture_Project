@@ -1,4 +1,5 @@
-﻿using CleanArchitecture.Domain.Employees;
+﻿using CleanArchitecture.Domain.Abstractions;
+using CleanArchitecture.Domain.Employees;
 using GenericRepository;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -20,6 +21,28 @@ namespace CleanArchitecture_2025.Infrastructure.Context
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+        }
+
+        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+        {
+            var entries = ChangeTracker.Entries<Entity>();
+
+            foreach (var entry in entries)
+            {
+                if (entry.State == EntityState.Added)
+                {
+                    entry.Property(p => p.CreateAt)
+                        .CurrentValue = DateTimeOffset.Now;
+                }
+                if (entry.State == EntityState.Modified)
+                {
+                    entry.Property(p => p.UpdateAt)
+                        .CurrentValue = DateTimeOffset.Now;
+                }
+            }
+
+
+            return base.SaveChangesAsync(cancellationToken);
         }
 
     }

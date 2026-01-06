@@ -1,6 +1,7 @@
 using CleanArchitecture_2025.Application;
 using CleanArchitecture_2025.Infrastructure;
 using CleanArchitecture_2025.WebAPI.Controllers;
+using CleanArchitecture_2025.WebAPI.Modules;
 using Microsoft.AspNetCore.OData;
 using Microsoft.AspNetCore.RateLimiting;
 using Scalar.AspNetCore;
@@ -46,6 +47,9 @@ x.AllowAnyHeader()
 .AllowCredentials()
 .AllowAnyMethod()
 .SetIsOriginAllowed(t => true));
+
+app.RegisterRoutes();
+
 //Yazýlacak her kontroller RequireRateLimiting ile fixed limiter a girecek
 app.MapControllers().RequireRateLimiting("fixed");
 
