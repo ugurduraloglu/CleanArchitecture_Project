@@ -8,42 +8,53 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CleanArchitecture_2025.Infrastructure.Context
+namespace CleanArchitecture_2025.Infrastructure.Context;
+internal sealed class ApplicationDbContext : DbContext, IUnitOfWork
 {
-    internal sealed class ApplicationDbContext : DbContext , IUnitOfWork
+    public ApplicationDbContext(DbContextOptions options) : base(options)
     {
-        public ApplicationDbContext(DbContextOptions options) : base(options) 
-        {
-            
-        }
-        public DbSet<Employee> Employees { get; set; }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
-        }
+    }
+    public DbSet<Employee> Employees { get; set; }
 
-        public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
-        {
-            var entries = ChangeTracker.Entries<Entity>();
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+    }
 
-            foreach (var entry in entries)
+    public override Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    {
+        var entries = ChangeTracker.Entries<Entity>();
+
+        foreach (var entry in entries)
+        {
+            if (entry.State == EntityState.Added)
             {
-                if (entry.State == EntityState.Added)
+                entry.Property(p => p.CreateAt)
+                    .CurrentValue = DateTimeOffset.Now;
+            }
+
+            if (entry.State == EntityState.Modified)
+            {
+                if (entry.Property(p => p.IsDeleted).CurrentValue == true)
                 {
-                    entry.Property(p => p.CreateAt)
-                        .CurrentValue = DateTimeOffset.Now;
+                    entry.Property(p => p.DeleteAt).CurrentValue = DateTimeOffset.Now;
                 }
-                if (entry.State == EntityState.Modified)
+                else
                 {
                     entry.Property(p => p.UpdateAt)
                         .CurrentValue = DateTimeOffset.Now;
                 }
             }
 
-
-            return base.SaveChangesAsync(cancellationToken);
+            if (entry.State == EntityState.Deleted)
+            {
+                throw new ArgumentException("Db den direkt silme işlemi gerçekleştiremezsiniz!");
+            }
         }
 
+
+        return base.SaveChangesAsync(cancellationToken);
     }
+
 }

@@ -5,10 +5,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CleanArchitecture.Domain.Employees
+namespace CleanArchitecture.Domain.Employees;
+public interface IEmployeeRepository : IRepository<Employee>
 {
-    public interface IEmployeeRepository : IRepository<Employee>
-    {
 
-    }
 }

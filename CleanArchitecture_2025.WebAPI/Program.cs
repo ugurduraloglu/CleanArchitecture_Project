@@ -1,5 +1,6 @@
 using CleanArchitecture_2025.Application;
 using CleanArchitecture_2025.Infrastructure;
+using CleanArchitecture_2025.WebAPI;
 using CleanArchitecture_2025.WebAPI.Controllers;
 using CleanArchitecture_2025.WebAPI.Modules;
 using Microsoft.AspNetCore.OData;
@@ -33,7 +34,7 @@ x.AddFixedWindowLimiter("fixed", cfg =>
     cfg.PermitLimit = 100;
     cfg.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
 }));
-
+builder.Services.AddExceptionHandler<ExceptionHandler>().AddProblemDetails();
 var app = builder.Build();
 
 
@@ -50,6 +51,7 @@ x.AllowAnyHeader()
 
 app.RegisterRoutes();
 
+app.UseExceptionHandler();
 //Yazýlacak her kontroller RequireRateLimiting ile fixed limiter a girecek
 app.MapControllers().RequireRateLimiting("fixed");
 

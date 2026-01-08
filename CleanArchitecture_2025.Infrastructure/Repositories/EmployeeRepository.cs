@@ -8,12 +8,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CleanArchitecture_2025.Infrastructure.Repositories
+namespace CleanArchitecture_2025.Infrastructure.Repositories;
+internal sealed class EmployeeRepository : Repository<Employee, ApplicationDbContext>, IEmployeeRepository
 {
-    internal sealed class EmployeeRepository : Repository<Employee,ApplicationDbContext>, IEmployeeRepository     
+    public EmployeeRepository(ApplicationDbContext context) : base(context)
     {
-        public EmployeeRepository(ApplicationDbContext context) : base(context)
-        {
-        }
     }
 }

@@ -8,19 +8,17 @@ using System.Net.NetworkInformation;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CleanArchitecture_2025.Application
+namespace CleanArchitecture_2025.Application;
+public static class ApplicationRegistrar
 {
-    public static class ApplicationRegistrar
+    public static IServiceCollection AddApplication(this IServiceCollection services)
     {
-        public static IServiceCollection AddApplication(this IServiceCollection services)
+        services.AddMediatR(conf =>
         {
-            services.AddMediatR(conf =>
-            {
-                conf.RegisterServicesFromAssembly(typeof(ApplicationRegistrar).Assembly);
-                conf.AddOpenBehavior(typeof(ValidationBehavior<,>));
-            });
+            conf.RegisterServicesFromAssembly(typeof(ApplicationRegistrar).Assembly);
+            conf.AddOpenBehavior(typeof(ValidationBehavior<,>));
+        });
 
-            return services;
-        }
+        return services;
     }
 }

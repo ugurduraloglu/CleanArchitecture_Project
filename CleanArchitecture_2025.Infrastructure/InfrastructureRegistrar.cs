@@ -12,32 +12,30 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CleanArchitecture_2025.Infrastructure
+namespace CleanArchitecture_2025.Infrastructure;
+public static class InfrastructureRegistrar
 {
-    public static class InfrastructureRegistrar
+    public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        public static IServiceCollection AddInfrastructure(this IServiceCollection services,IConfiguration configuration)
+        services.AddDbContext<ApplicationDbContext>(opt =>
         {
-            services.AddDbContext<ApplicationDbContext>(opt =>
-            {
-                string connectionString = configuration.GetConnectionString("SqlServer")!;//null gelemeyeceğini garanti veriyorum.
-                opt.UseSqlServer(connectionString);
-            });
+            string connectionString = configuration.GetConnectionString("SqlServer")!;//null gelemeyeceğini garanti veriyorum.
+            opt.UseSqlServer(connectionString);
+        });
 
-            //Scrutor kütüphanesi ile dependency ınjection burayı yazmıyoruz =>
-            //services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+        //Scrutor kütüphanesi ile dependency ınjection burayı yazmıyoruz =>
+        //services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 
-            services.AddScoped<IUnitOfWork>(srv => srv.GetRequiredService<ApplicationDbContext>());
+        services.AddScoped<IUnitOfWork>(srv => srv.GetRequiredService<ApplicationDbContext>());
 
-            services.Scan(opt => opt
-            .FromAssemblies(typeof(InfrastructureRegistrar).Assembly)
-            .AddClasses(publicOnly:false)
-            .UsingRegistrationStrategy(RegistrationStrategy.Skip)
-            .AsImplementedInterfaces()
-            .WithScopedLifetime()
-            );
+        services.Scan(opt => opt
+        .FromAssemblies(typeof(InfrastructureRegistrar).Assembly)
+        .AddClasses(publicOnly: false)
+        .UsingRegistrationStrategy(RegistrationStrategy.Skip)
+        .AsImplementedInterfaces()
+        .WithScopedLifetime()
+        );
 
-            return services;
-        }
+        return services;
     }
 }
